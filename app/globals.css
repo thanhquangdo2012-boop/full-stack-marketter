@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-be-vietnam-pro), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+  Bảng màu gốc từ Full-stack-Marketer.html trùng khớp gần như tuyệt đối với
+  bảng màu mặc định của Tailwind — dùng thẳng utility có sẵn thay vì định
+  nghĩa theme riêng:
+
+    navy        #0f172a  -> slate-900
+    navy-light  #1e293b  -> slate-800   (cũng là "ink" trong bản gốc)
+    gold        #f59e0b  -> amber-500
+    gold-dark   #d97706  -> amber-600
+    muted       #64748b  -> slate-500
+    bg-soft     #f8fafc  -> slate-50
+    border      #e2e8f0  -> slate-200
+    green       #16a34a  -> green-600
+
+  Đây là thiết kế light-only có chủ đích (section navy là mảng màu cố định
+  trong bố cục, không phải dark mode) — không bật prefers-color-scheme.
+*/
+
+body {
+  background: #ffffff;
+  color: var(--color-slate-800);
+}

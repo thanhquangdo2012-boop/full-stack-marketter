@@ -1,0 +1,89 @@
+{
+  "_draft_notice": "NỘI DUNG NHÁP — xem quiz-draft.md để đọc dễ hơn. Cần HV duyệt trước khi dùng thật.",
+  "questions": [
+    {
+      "id": "role",
+      "text": "Vai trò chính của bạn hiện tại là gì?",
+      "type": "single",
+      "options": [
+        { "value": "content_writer", "label": "Content Writer" },
+        { "value": "ads", "label": "Digital Ads / Ads thủ" },
+        { "value": "designer", "label": "Thiết kế (Designer)" },
+        { "value": "pr", "label": "PR / Truyền thông" },
+        { "value": "other", "label": "Khác" }
+      ]
+    },
+    {
+      "id": "extra_work",
+      "text": "Việc \"ngoài chuyên môn\" bạn đang bị giao nhiều nhất là gì?",
+      "type": "single",
+      "options": [
+        { "value": "event_coordination", "label": "Điều phối sự kiện / làm việc với đối tác ngoài" },
+        { "value": "reporting", "label": "Tổng hợp số liệu, viết báo cáo trình ban lãnh đạo" },
+        { "value": "customer_insight", "label": "Phỏng vấn khách hàng, thu thập insight" },
+        { "value": "sales_copywriting", "label": "Viết quảng cáo bán hàng trực tiếp" },
+        { "value": "mixed", "label": "Khác / nhiều việc cùng lúc" }
+      ]
+    },
+    {
+      "id": "company_size",
+      "text": "Quy mô công ty bạn đang làm?",
+      "type": "single",
+      "options": [
+        { "value": "under_20", "label": "Dưới 20 người" },
+        { "value": "20_100", "label": "20–100 người" },
+        { "value": "over_100", "label": "Trên 100 người" }
+      ]
+    },
+    {
+      "id": "exec_exposure",
+      "text": "Bạn có thường xuyên phải trình bày/báo cáo trực tiếp với cấp trên (sếp lớn) không?",
+      "type": "single",
+      "options": [
+        { "value": "often", "label": "Thường xuyên" },
+        { "value": "sometimes", "label": "Thỉnh thoảng" },
+        { "value": "rarely", "label": "Hiếm khi" }
+      ]
+    },
+    {
+      "id": "burnout_level",
+      "text": "Mức độ bạn cảm thấy kỹ năng chuyên môn chính đang bị mài mòn vì ôm việc khác?",
+      "type": "scale",
+      "min": 1,
+      "max": 5
+    }
+  ],
+  "recommendation_rules": [
+    {
+      "when": { "extra_work": "event_coordination" },
+      "recommend": ["checklist-dieu-phoi-lien-phong-ban", "nguon-hoc-chon-loc#1"]
+    },
+    {
+      "when": { "extra_work": "reporting" },
+      "recommend": ["mau-to-trinh-xin-nguon-luc", "nguon-hoc-chon-loc#2", "tieu-chi-tu-danh-gia"]
+    },
+    {
+      "when": { "extra_work": "customer_insight" },
+      "recommend": ["nguon-hoc-chon-loc#3"]
+    },
+    {
+      "when": { "extra_work": "sales_copywriting" },
+      "recommend": ["nguon-hoc-chon-loc#4"]
+    },
+    {
+      "when": { "extra_work": "mixed" },
+      "recommend": ["nguon-hoc-chon-loc#1", "nguon-hoc-chon-loc#2", "nguon-hoc-chon-loc#3", "nguon-hoc-chon-loc#4"]
+    }
+  ],
+  "always_include": ["checklist-truoc-khi-nop"],
+  "conditional_rules": [
+    {
+      "when": { "exec_exposure": "often" },
+      "prepend": ["kich-ban-hop-sep-lon"]
+    },
+    {
+      "when": { "burnout_level_gte": 4 },
+      "show_empathy_message": "Cảm giác đó rất thật — và đây chính xác là lý do lộ trình này tồn tại."
+    }
+  ]
+}
