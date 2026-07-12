@@ -128,10 +128,13 @@ export default function CheckoutForm({ product, productName, priceFormatted }: P
           </label>
           <input
             id="fullName"
+            name="name"
+            autoComplete="name"
+            placeholder="Nguyễn Văn A"
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -140,10 +143,14 @@ export default function CheckoutForm({ product, productName, priceFormatted }: P
           </label>
           <input
             id="phone"
+            name="tel"
+            type="tel"
+            autoComplete="tel"
+            placeholder="0987654321"
             required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -152,11 +159,14 @@ export default function CheckoutForm({ product, productName, priceFormatted }: P
           </label>
           <input
             id="email"
+            name="email"
             type="email"
+            autoComplete="email"
+            placeholder="email@vidu.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
       </div>

@@ -44,11 +44,15 @@ export default function AdminLoginForm() {
           </label>
           <input
             id="email"
+            name="username"
             type="email"
+            autoComplete="username"
+            placeholder="admin@vidu.com"
             required
+            autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -57,11 +61,14 @@ export default function AdminLoginForm() {
           </label>
           <input
             id="password"
+            name="current-password"
             type="password"
+            autoComplete="current-password"
+            placeholder="Nhập mật khẩu"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
       </div>

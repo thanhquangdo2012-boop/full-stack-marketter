@@ -52,11 +52,14 @@ export default function LoginForm() {
           </label>
           <input
             id="identifier"
+            name="username"
+            autoComplete="username"
+            placeholder="0987654321 hoặc email@vidu.com"
             required
             autoFocus={!prefilled}
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -65,12 +68,15 @@ export default function LoginForm() {
           </label>
           <input
             id="password"
+            name="current-password"
             type="password"
+            autoComplete="current-password"
+            placeholder="Nhập mật khẩu"
             required
             autoFocus={prefilled}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
       </div>

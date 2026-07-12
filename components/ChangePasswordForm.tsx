@@ -64,11 +64,15 @@ export default function ChangePasswordForm({ forced }: Props) {
           </label>
           <input
             id="newPassword"
+            name="new-password"
             type="password"
+            autoComplete="new-password"
+            placeholder="Ít nhất 8 ký tự"
             required
+            autoFocus
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
         <div>
@@ -77,11 +81,14 @@ export default function ChangePasswordForm({ forced }: Props) {
           </label>
           <input
             id="confirmPassword"
+            name="new-password-confirm"
             type="password"
+            autoComplete="new-password"
+            placeholder="Gõ lại mật khẩu mới"
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
+            className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
           />
         </div>
       </div>
