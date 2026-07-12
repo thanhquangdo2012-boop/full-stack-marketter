@@ -1,11 +1,15 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("");
+  const searchParams = useSearchParams();
+  // Đến từ /checkout khi SĐT/email đã có tài khoản — tự điền sẵn để khách
+  // chỉ cần gõ mật khẩu, đỡ phải gõ lại từ đầu.
+  const [identifier, setIdentifier] = useState(() => searchParams.get("identifier") ?? "");
+  const prefilled = Boolean(searchParams.get("identifier"));
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -49,6 +53,7 @@ export default function LoginForm() {
           <input
             id="identifier"
             required
+            autoFocus={!prefilled}
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
@@ -62,6 +67,7 @@ export default function LoginForm() {
             id="password"
             type="password"
             required
+            autoFocus={prefilled}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm"
