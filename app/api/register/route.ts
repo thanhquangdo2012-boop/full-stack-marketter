@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
-import { hashPassword } from "@/lib/auth";
+import { hashPassword, createMemberSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { registerRateLimit, getClientIp } from "@/lib/rate-limit";
 import { PRODUCT_INFO, getMvp3Price, generateOrderCode, formatVnd } from "@/lib/pricing";
 
@@ -69,9 +69,16 @@ async function handleRegister(req: Request) {
     (await db.from("members").select("id").eq("email", email).maybeSingle()).data;
 
   let memberId: string;
+  let isNewMember: boolean;
 
   if (existing) {
+    // Tài khoản đã tồn tại — KHÔNG auto-login ở đây. Ai đó chỉ cần biết một
+    // SĐT/email đã đăng ký là có thể gõ vào form này; nếu tự động đăng nhập
+    // luôn thì đây thành lỗ hổng chiếm quyền tài khoản người khác (RULE-02:
+    // đổi trạng thái/đăng nhập phải qua xác thực thật, không phải qua form
+    // công khai này). Người dùng thật phải tự /login bằng mật khẩu của họ.
     memberId = existing.id;
+    isNewMember = false;
     await db
       .from("members")
       .update({ interested_product: product })
@@ -100,6 +107,7 @@ async function handleRegister(req: Request) {
       );
     }
     memberId = created.id;
+    isNewMember = true;
   }
 
   // Giá luôn tính lại ở server, không tin số liệu từ client — RULE-04.
@@ -131,17 +139,36 @@ async function handleRegister(req: Request) {
     );
   }
 
-  return NextResponse.json({
+  const body = {
     orderCode,
     amountFormatted: formatVnd(amount),
     productName: PRODUCT_INFO[product].name,
     loginId: phone,
     defaultPassword: DEFAULT_PASSWORD,
+    isNewMember,
     bank: {
       accountName: process.env.BANK_ACCOUNT_NAME ?? "",
       accountNumber: process.env.BANK_ACCOUNT_NUMBER ?? "",
       bankName: process.env.BANK_NAME ?? "",
     },
     zaloContact: process.env.NEXT_PUBLIC_ZALO_CONTACT ?? "",
-  });
+  };
+
+  const res = NextResponse.json(body);
+
+  // Chỉ auto-login tài khoản VỪA tạo (xem lý do ở nhánh existing/else phía
+  // trên). Dashboard sẽ tự chuyển hướng qua /change-password trước vì
+  // must_change_password = true, đúng luồng bảo mật hiện có.
+  if (isNewMember) {
+    const token = await createMemberSessionToken(memberId);
+    res.cookies.set(SESSION_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  }
+
+  return res;
 }

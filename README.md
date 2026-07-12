@@ -53,6 +53,18 @@ node -e "require('bcryptjs').hash('mật-khẩu-thật-của-bạn', 12).then(co
 
 Dán kết quả vào `ADMIN_PASSWORD_HASH` trong `.env.local`.
 
+⚠️ **Escape dấu `$`:** Next.js load `.env.local` với cơ chế expand kiểu shell
+(`$VAR` bị hiểu là tham chiếu biến khác). Hash bcrypt luôn có dạng `$2a$12$...`
+nên PHẢI escape mỗi dấu `$` thành `\$`, ví dụ:
+
+```
+ADMIN_PASSWORD_HASH=\$2a\$12\$abc123...
+```
+
+Nếu quên bước này, phần đầu hash bị cắt mất và đăng nhập `/admin` luôn báo
+sai mật khẩu dù gõ đúng — chỉ xảy ra ở `.env.local` local, biến khai báo
+trực tiếp trên Vercel dashboard không bị ảnh hưởng.
+
 ## 4. Chạy dev
 
 ```bash
