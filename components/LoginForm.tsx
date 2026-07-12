@@ -78,6 +78,12 @@ export default function LoginForm() {
       >
         {submitting ? "Đang xử lý..." : "Đăng nhập"}
       </button>
+
+      <p className="text-xs text-slate-500 mt-4 text-center">
+        Mới đăng ký lần đầu và chưa từng đổi mật khẩu? Dùng mật khẩu mặc định{" "}
+        <strong className="text-slate-700">123456789</strong> — hệ thống sẽ bắt bạn đặt mật khẩu
+        mới ngay sau khi đăng nhập.
+      </p>
     </form>
   );
 }
