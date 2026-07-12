@@ -2,15 +2,20 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { DEFAULT_MEMBER_PASSWORD } from "@/lib/constants";
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   // Đến từ /checkout khi SĐT/email đã có tài khoản — tự điền sẵn để khách
-  // chỉ cần gõ mật khẩu, đỡ phải gõ lại từ đầu.
+  // chỉ cần bấm Đăng nhập, đỡ phải gõ lại từ đầu.
   const [identifier, setIdentifier] = useState(() => searchParams.get("identifier") ?? "");
   const prefilled = Boolean(searchParams.get("identifier"));
-  const [password, setPassword] = useState("");
+  // Chỉ điền sẵn mật khẩu khi server đã xác nhận (qua DB, xem
+  // app/api/register/route.ts) tài khoản này CHƯA từng đổi mật khẩu — nếu
+  // khách đã đổi mật khẩu thật, ta không biết mật khẩu đó nên không điền.
+  const suggestDefault = searchParams.get("suggestDefault") === "1";
+  const [password, setPassword] = useState(() => (suggestDefault ? DEFAULT_MEMBER_PASSWORD : ""));
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,7 +78,7 @@ export default function LoginForm() {
             autoComplete="current-password"
             placeholder="Nhập mật khẩu"
             required
-            autoFocus={prefilled}
+            autoFocus={prefilled && !suggestDefault}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm placeholder:text-slate-400"
@@ -86,16 +91,24 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={submitting}
+        autoFocus={suggestDefault}
         className="w-full bg-slate-900 text-white font-bold py-3 rounded-lg disabled:opacity-60"
       >
         {submitting ? "Đang xử lý..." : "Đăng nhập"}
       </button>
 
-      <p className="text-xs text-slate-500 mt-4 text-center">
-        Mới đăng ký lần đầu và chưa từng đổi mật khẩu? Dùng mật khẩu mặc định{" "}
-        <strong className="text-slate-700">123456789</strong> — hệ thống sẽ bắt bạn đặt mật khẩu
-        mới ngay sau khi đăng nhập.
-      </p>
+      {suggestDefault ? (
+        <p className="text-xs text-slate-500 mt-4 text-center">
+          Đã tự điền mật khẩu mặc định vì tài khoản này chưa từng đổi mật khẩu — bấm{" "}
+          <strong className="text-slate-700">Đăng nhập</strong> để tiếp tục.
+        </p>
+      ) : (
+        <p className="text-xs text-slate-500 mt-4 text-center">
+          Mới đăng ký lần đầu và chưa từng đổi mật khẩu? Dùng mật khẩu mặc định{" "}
+          <strong className="text-slate-700">123456789</strong> — hệ thống sẽ bắt bạn đặt mật khẩu
+          mới ngay sau khi đăng nhập.
+        </p>
+      )}
     </form>
   );
 }

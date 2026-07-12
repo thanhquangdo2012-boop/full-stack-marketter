@@ -4,10 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { hashPassword, createMemberSessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { registerRateLimit, getClientIp } from "@/lib/rate-limit";
 import { PRODUCT_INFO, getMvp3Price, generateOrderCode, formatVnd } from "@/lib/pricing";
-
-// Mật khẩu mặc định giống nhau cho mọi tài khoản mới — điểm yếu đã biết,
-// bắt buộc đi kèm must_change_password = true. Xem CLAUDE.md mục 4.
-const DEFAULT_PASSWORD = "123456789";
+import { DEFAULT_MEMBER_PASSWORD } from "@/lib/constants";
 
 const bodySchema = z.object({
   fullName: z.string().trim().min(2, "Vui lòng nhập họ tên").max(100),
@@ -70,21 +67,31 @@ async function handleRegister(req: Request) {
 
   let memberId: string;
   let isNewMember: boolean;
+  // true khi tài khoản (mới hoặc có sẵn) vẫn đang dùng mật khẩu mặc định
+  // chưa đổi — dùng để quyết định có gợi ý điền sẵn mật khẩu ở /login hay
+  // không. KHÔNG suy ra giá trị này từ input của request, luôn đọc lại từ
+  // DB (RULE-04).
+  let stillDefaultPassword: boolean;
 
   if (existing) {
     // Tài khoản đã tồn tại — KHÔNG auto-login ở đây. Ai đó chỉ cần biết một
     // SĐT/email đã đăng ký là có thể gõ vào form này; nếu tự động đăng nhập
     // luôn thì đây thành lỗ hổng chiếm quyền tài khoản người khác (RULE-02:
     // đổi trạng thái/đăng nhập phải qua xác thực thật, không phải qua form
-    // công khai này). Người dùng thật phải tự /login bằng mật khẩu của họ.
+    // công khai này). Người dùng thật phải tự /login bằng mật khẩu của họ —
+    // ta chỉ được phép GỢI Ý điền sẵn mật khẩu mặc định (không tự đăng
+    // nhập), và chỉ khi xác nhận qua DB rằng họ chưa từng đổi mật khẩu.
     memberId = existing.id;
     isNewMember = false;
-    await db
+    const { data: updated } = await db
       .from("members")
       .update({ interested_product: product })
-      .eq("id", memberId);
+      .eq("id", memberId)
+      .select("must_change_password")
+      .single();
+    stillDefaultPassword = updated?.must_change_password ?? false;
   } else {
-    const passwordHash = await hashPassword(DEFAULT_PASSWORD);
+    const passwordHash = await hashPassword(DEFAULT_MEMBER_PASSWORD);
     const { data: created, error } = await db
       .from("members")
       .insert({
@@ -108,6 +115,7 @@ async function handleRegister(req: Request) {
     }
     memberId = created.id;
     isNewMember = true;
+    stillDefaultPassword = true;
   }
 
   // Giá luôn tính lại ở server, không tin số liệu từ client — RULE-04.
@@ -144,8 +152,9 @@ async function handleRegister(req: Request) {
     amountFormatted: formatVnd(amount),
     productName: PRODUCT_INFO[product].name,
     loginId: phone,
-    defaultPassword: DEFAULT_PASSWORD,
+    defaultPassword: DEFAULT_MEMBER_PASSWORD,
     isNewMember,
+    stillDefaultPassword,
     bank: {
       accountName: process.env.BANK_ACCOUNT_NAME ?? "",
       accountNumber: process.env.BANK_ACCOUNT_NUMBER ?? "",

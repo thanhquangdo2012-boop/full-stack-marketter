@@ -17,6 +17,7 @@ type RegisterResponse = {
   loginId: string;
   defaultPassword: string;
   isNewMember: boolean;
+  stillDefaultPassword: boolean;
   bank: { accountName: string; accountNumber: string; bankName: string };
   zaloContact: string;
 };
@@ -96,7 +97,9 @@ export default function CheckoutForm({ product, productName, priceFormatted }: P
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href={`/login?identifier=${encodeURIComponent(existingAccountNotice.loginId)}`}
+            href={`/login?identifier=${encodeURIComponent(existingAccountNotice.loginId)}${
+              existingAccountNotice.stillDefaultPassword ? "&suggestDefault=1" : ""
+            }`}
             className="flex-1 text-center bg-slate-900 text-white font-semibold py-3 rounded-lg"
           >
             Đăng nhập
