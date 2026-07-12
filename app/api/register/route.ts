@@ -20,6 +20,20 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
+  try {
+    return await handleRegister(req);
+  } catch (err) {
+    // TẠM THỜI để chẩn đoán lỗi 500 rỗng trên Vercel — xoá try/catch này
+    // sau khi xác định nguyên nhân, khôi phục thông báo chung theo RULE-11.
+    console.error("[api/register] unhandled", err);
+    return NextResponse.json(
+      { debugError: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleRegister(req: Request) {
   // RULE-08/RULE-09: rate limit bằng Redis trước khi xử lý bất kỳ logic nào.
   const ip = getClientIp(req);
   const { success } = await registerRateLimit.limit(ip);
