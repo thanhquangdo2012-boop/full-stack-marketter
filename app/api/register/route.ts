@@ -23,11 +23,11 @@ export async function POST(req: Request) {
   try {
     return await handleRegister(req);
   } catch (err) {
-    // TẠM THỜI để chẩn đoán lỗi 500 rỗng trên Vercel — xoá try/catch này
-    // sau khi xác định nguyên nhân, khôi phục thông báo chung theo RULE-11.
+    // RULE-11: log chi tiết ở server, KHÔNG trả chi tiết lỗi (message/stack)
+    // về client — tránh lộ cấu trúc hệ thống.
     console.error("[api/register] unhandled", err);
     return NextResponse.json(
-      { debugError: err instanceof Error ? err.message : String(err) },
+      { error: "Đã xảy ra lỗi, vui lòng thử lại." },
       { status: 500 }
     );
   }
