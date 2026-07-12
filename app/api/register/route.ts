@@ -5,6 +5,7 @@ import { hashPassword, createMemberSessionToken, SESSION_COOKIE_NAME } from "@/l
 import { registerRateLimit, getClientIp } from "@/lib/rate-limit";
 import { PRODUCT_INFO, getMvp3Price, generateOrderCode, formatVnd } from "@/lib/pricing";
 import { DEFAULT_MEMBER_PASSWORD } from "@/lib/constants";
+import { notifyAdminNewOrder } from "@/lib/email";
 
 const bodySchema = z.object({
   fullName: z.string().trim().min(2, "Vui lòng nhập họ tên").max(100),
@@ -146,6 +147,18 @@ async function handleRegister(req: Request) {
       { status: 500 }
     );
   }
+
+  // Best-effort — tự nuốt lỗi bên trong, không được làm hỏng response đăng
+  // ký thật của khách nếu Resend lỗi/chưa cấu hình.
+  await notifyAdminNewOrder({
+    orderCode,
+    productName: PRODUCT_INFO[product].name,
+    amountFormatted: formatVnd(amount),
+    customerName: fullName,
+    customerPhone: phone,
+    customerEmail: email,
+    isNewMember,
+  });
 
   const body = {
     orderCode,
