@@ -65,6 +65,26 @@ Nếu quên bước này, phần đầu hash bị cắt mất và đăng nhập 
 sai mật khẩu dù gõ đúng — chỉ xảy ra ở `.env.local` local, biến khai báo
 trực tiếp trên Vercel dashboard không bị ảnh hưởng.
 
+## 3.5. SePay — tự động xác nhận thanh toán (tuỳ chọn)
+
+Không bắt buộc — không cấu hình thì vẫn xác nhận đơn tay ở `/admin/orders` bình thường.
+
+1. Tạo tài khoản tại [sepay.vn](https://sepay.vn), liên kết tài khoản ngân hàng nhận tiền
+   (VIB) — bước này bạn tự làm, cần OTP/đăng nhập ngân hàng thật.
+2. Tạo `SEPAY_WEBHOOK_SECRET` bằng `openssl rand -hex 32`, dán vào `.env.local` **và** vào Vercel
+   Environment Variables.
+3. Trên dashboard SePay, tạo Webhook mới:
+   - URL: `https://<domain-cua-ban>/api/webhooks/sepay`
+   - Kiểu xác thực: **HMAC-SHA256** (không dùng "None" hay "API Key" đơn giản)
+   - Secret: dán đúng giá trị `SEPAY_WEBHOOK_SECRET` ở bước 2
+4. Đảm bảo mọi giao dịch chuyển khoản (checkout, admin xác nhận tay) đều dùng đúng "Nội dung
+   CK" là mã đơn hàng (`FSM-XXXXXX`) — webhook đọc mã đơn từ nội dung chuyển khoản qua regex,
+   không khớp được sẽ bỏ qua giao dịch đó (không lỗi, chỉ không tự xác nhận).
+
+Webhook chỉ tự xác nhận khi **số tiền khớp chính xác** với đơn hàng — nếu lệch, hệ thống gửi
+email cảnh báo (`[Cần kiểm tra tay]`) và để bạn tự xác nhận thủ công thay vì tự động mở khoá sai
+giá.
+
 ## 4. Chạy dev
 
 ```bash
